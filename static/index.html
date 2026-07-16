@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookly — Books, eBooks &amp; More</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand:     #0D1F2D;
+  --brand-mid: #1A3550;
+  --gilt:      #C9943A;
+  --gilt-h:    #A87A28;
+  --page:      #FFFFFF;
+  --section:   #F7F5F1;
+  --border:    #E5E0D8;
+  --text:      #1A1A1A;
+  --muted:     #666;
+  --sale:      #C0392B;
+  --star:      #F5A623;
+  --serif:     'Playfair Display', Georgia, serif;
+  --sans:      'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body { font-family: var(--sans); color: var(--text); background: var(--page); }
+
+/* ── Announcement bar ──────────────────────── */
+.top-bar {
+  background: var(--brand);
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+.top-bar a { color: var(--gilt); text-decoration: none; font-weight: 500; }
+
+/* ── Main header ───────────────────────────── */
+.main-header {
+  background: var(--brand);
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logo {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  color: white;
+  text-decoration: none;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.search-bar {
+  flex: 1;
+  max-width: 560px;
+  display: flex;
+}
+.search-bar input {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px 0 0 4px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  outline: none;
+}
+.search-bar button {
+  background: var(--gilt);
+  border: none;
+  padding: 0 18px;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+.search-bar button:hover { background: var(--gilt-h); }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+}
+.header-action {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.header-action:hover { color: white; }
+
+/* ── Category nav ──────────────────────────── */
+.cat-nav {
+  background: var(--page);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cat-nav::-webkit-scrollbar { display: none; }
+.cat-nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 14px 15px;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.cat-nav a:hover  { color: var(--brand); }
+.cat-nav a.active { color: var(--brand); border-bottom-color: var(--gilt); font-weight: 600; }
+.cat-nav .sale    { color: var(--sale); font-weight: 600; }
+
+/* ── Hero ──────────────────────────────────── */
+.hero {
+  background: linear-gradient(130deg, #0D1F2D 0%, #1A3550 60%, #0D3040 100%);
+  padding: 68px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  right: 80px; top: -60px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(201,148,58,0.1) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-content { max-width: 560px; position: relative; z-index: 1; }
+.hero-eyebrow {
+  color: var(--gilt);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-family: var(--serif);
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.13;
+  margin-bottom: 18px;
+}
+.hero p {
+  color: rgba(255,255,255,0.72);
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-bottom: 32px;
+  max-width: 440px;
+}
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-primary {
+  background: var(--gilt);
+  color: white;
+  border: none;
+  padding: 13px 30px;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--gilt-h); }
+
+.btn-outline {
+  background: transparent;
+  color: rgba(255,255,255,0.9);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  padding: 13px 30px;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btn-outline:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); }
+
+/* ── Sections ──────────────────────────────── */
+.section { padding: 52px 40px; }
+.section.alt { background: var(--section); }
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  color: var(--brand);
+  font-weight: 600;
+}
+.section-link {
+  color: var(--gilt);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.section-link:hover { text-decoration: underline; }
+
+/* ── Book grid ─────────────────────────────── */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 28px 20px;
+}
+
+.book-card { display: flex; flex-direction: column; gap: 10px; cursor: pointer; }
+.book-card:hover .book-cover {
+  transform: translateY(-5px);
+  box-shadow: 5px 10px 24px rgba(0,0,0,0.22);
+}
+
+.book-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 2px;
+  box-shadow: 3px 5px 14px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 14px 12px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+/* book spine */
+.book-cover::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 11%;
+  background: rgba(0,0,0,0.25);
+}
+.cover-title {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+.cover-author {
+  font-size: 0.67rem;
+  opacity: 0.82;
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+}
+
+/* Cover palettes */
+.c1  { background: linear-gradient(155deg,#0b3244 0%,#0d6b8a 100%); color:#d8f0f8; }
+.c2  { background: linear-gradient(155deg,#5c0a15 0%,#a01828 100%); color:#fde8ec; }
+.c3  { background: linear-gradient(155deg,#b54300 0%,#e06820 100%); color:#fff0e0; }
+.c4  { background: linear-gradient(155deg,#141e3a 0%,#243a6a 100%); color:#d8e4fa; }
+.c5  { background: linear-gradient(155deg,#c8a888 0%,#dfc4a8 100%); color:#3a2416; }
+.c6  { background: linear-gradient(155deg,#0c2818 0%,#1a5030 100%); color:#c8e8d4; }
+.c7  { background: linear-gradient(155deg,#141414 0%,#282828 100%); color:#e8c840; }
+.c8  { background: linear-gradient(155deg,#706050 0%,#9a8878 100%); color:#f5ece0; }
+.c9  { background: linear-gradient(155deg,#1c3d14 0%,#3a6824 100%); color:#dcefd0; }
+.c10 { background: linear-gradient(155deg,#1e0f38 0%,#4a2878 100%); color:#e0d0f8; }
+.c11 { background: linear-gradient(155deg,#0f2e4a 0%,#2060a0 100%); color:#c0ddf5; }
+.c12 { background: linear-gradient(155deg,#8a3030 0%,#c05858 100%); color:#fde8e8; }
+
+.book-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.book-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.book-author { font-size: 0.8rem; color: var(--muted); }
+.book-format { font-size: 0.72rem; color: var(--muted); }
+.book-rating { display: flex; align-items: center; gap: 5px; font-size: 0.77rem; }
+.stars { color: var(--star); letter-spacing: -1px; }
+.rating-count { color: var(--muted); }
+.book-price { display: flex; align-items: baseline; gap: 7px; margin-top: 2px; }
+.price { font-size: 0.95rem; font-weight: 600; }
+.price-sale { color: var(--sale); }
+.price-orig { font-size: 0.8rem; color: var(--muted); text-decoration: line-through; }
+
+.add-btn {
+  background: var(--brand);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 4px;
+  transition: background 0.15s;
+}
+.add-btn:hover { background: var(--brand-mid); }
+
+/* ── Membership banner ─────────────────────── */
+.promo-wrap { padding: 0 40px 52px; }
+.promo {
+  background: linear-gradient(135deg, #EBF4EE 0%, #D4EAD9 100%);
+  border: 1px solid #B4D4BC;
+  border-radius: 8px;
+  padding: 32px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.promo-badge {
+  background: var(--brand);
+  color: var(--gilt);
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+.promo-text h3 { font-family: var(--serif); font-size: 1.15rem; color: var(--brand); margin-bottom: 6px; }
+.promo-text p  { font-size: 0.875rem; color: #3a5a45; line-height: 1.55; }
+
+/* ── Footer ────────────────────────────────── */
+footer {
+  background: var(--brand);
+  color: rgba(255,255,255,0.65);
+  padding: 52px 40px 32px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+.footer-brand .logo { font-size: 1.5rem; display: block; margin-bottom: 12px; }
+.footer-brand p { font-size: 0.85rem; line-height: 1.65; max-width: 240px; }
+.footer-col h4 {
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-col a  { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.875rem; transition: color 0.15s; }
+.footer-col a:hover { color: white; }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+/* ── Floating chat ─────────────────────────── */
+.chat-fab {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--gilt);
+  border: none;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 1000;
+  transition: background 0.15s, transform 0.15s;
+}
+.chat-fab:hover { background: var(--gilt-h); transform: scale(1.06); }
+
+.chat-panel {
+  position: fixed;
+  bottom: 98px; right: 28px;
+  width: 380px;
+  height: 520px;
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+  overflow: hidden;
+  display: flex;
+  z-index: 999;
+  transform: translateY(18px) scale(0.97);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+.chat-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+/* Chat widget internals */
+.spine     { width: 5px; background: var(--gilt); flex-shrink: 0; }
+.chat-inner { flex: 1; display: flex; flex-direction: column; background: #F5F0E8; }
+
+.chat-header {
+  background: var(--brand);
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(201,148,58,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem; flex-shrink: 0;
+}
+.agent-name   { color: white; font-size: 0.85rem; font-weight: 600; line-height: 1.25; }
+.agent-status { color: var(--gilt); font-size: 0.7rem; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+.status-dot   { width: 5px; height: 5px; background: #5DBD82; border-radius: 50%; }
+.chat-close   { background: none; border: none; color: rgba(255,255,255,0.55); cursor: pointer; margin-left: auto; font-size: 1.1rem; padding: 4px; transition: color 0.15s; }
+.chat-close:hover { color: white; }
+
+.messages {
+  flex: 1; overflow-y: auto;
+  padding: 16px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.messages::-webkit-scrollbar       { width: 4px; }
+.messages::-webkit-scrollbar-thumb { background: #E0D8CC; border-radius: 2px; }
+
+.msg { max-width: 86%; padding: 9px 12px; font-size: 0.84rem; line-height: 1.58; white-space: pre-wrap; word-break: break-word; }
+.msg.agent { background: white; color: #2C1F14; border-radius: 2px 10px 10px 10px; align-self: flex-start; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.msg.user  { background: var(--brand); color: #EAE5DC; border-radius: 10px 2px 10px 10px; align-self: flex-end; }
+
+.typing { display: flex; align-items: center; gap: 4px; padding: 12px 13px; }
+.typing span { width: 6px; height: 6px; border-radius: 50%; background: #C8BFB0; animation: bounce 1.3s infinite ease-in-out; }
+.typing span:nth-child(2) { animation-delay: .18s; }
+.typing span:nth-child(3) { animation-delay: .36s; }
+@keyframes bounce {
+  0%,55%,100% { transform:translateY(0); background:#C8BFB0; }
+  28%          { transform:translateY(-5px); background:#8A7968; }
+}
+
+.input-bar {
+  background: white;
+  border-top: 1px solid #E5DDD3;
+  padding: 10px 13px;
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+}
+.input-bar textarea {
+  flex: 1; border: none; outline: none; resize: none;
+  font-family: var(--sans); font-size: 0.85rem; color: #2C1F14;
+  background: transparent; line-height: 1.5; min-height: 20px; max-height: 80px;
+}
+.input-bar textarea::placeholder { color: #8A7968; }
+.send-btn {
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: var(--gilt); color: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.send-btn:hover:not(:disabled) { background: var(--gilt-h); }
+.send-btn:disabled { background: #E5DDD3; cursor: default; }
+
+/* ── Responsive ────────────────────────────── */
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .main-header { padding: 12px 16px; }
+  .search-bar  { display: none; }
+  .cat-nav     { padding: 0 16px; }
+  .hero        { padding: 40px 20px; }
+  .hero h1     { font-size: 2rem; }
+  .section     { padding: 36px 16px; }
+  .promo-wrap  { padding: 0 16px 36px; }
+  .promo       { flex-direction: column; align-items: flex-start; padding: 24px 20px; gap: 16px; }
+  .book-grid   { grid-template-columns: repeat(2,1fr); gap: 16px 12px; }
+  footer       { padding: 36px 20px 24px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .chat-panel  { width: calc(100vw - 32px); right: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .typing span, .book-card:hover .book-cover { animation: none; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  Free standard shipping on orders $35+ &nbsp;·&nbsp; <a href="#">Join Bookly+</a> and get free shipping on every order
+</div>
+
+<header class="main-header">
+  <a class="logo" href="#">bookly</a>
+  <div class="search-bar">
+    <input type="text" placeholder="Search by title, author, or ISBN…">
+    <button aria-label="Search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+  </div>
+  <div class="header-actions">
+    <a class="header-action" href="#">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Sign In
+    </a>
+    <a class="header-action" href="#">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Wishlist
+    </a>
+    <a class="header-action" href="#">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Cart (0)
+    </a>
+  </div>
+</header>
+
+<nav class="cat-nav">
+  <a href="#" class="active">Books</a>
+  <a href="#">New Releases</a>
+  <a href="#">Best Sellers</a>
+  <a href="#">eBooks</a>
+  <a href="#">Children's</a>
+  <a href="#">Audiobooks</a>
+  <a href="#">Gift Cards</a>
+  <a href="#" class="sale">Sale</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-eyebrow">Summer Reading Event &nbsp;·&nbsp; Up to 40% Off</p>
+    <h1>Great Books for<br>Every Reader</h1>
+    <p>Explore our curated selection of bestsellers, new releases, and hidden gems — delivered to your door.</p>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#">Shop the Sale</a>
+      <a class="btn-outline" href="#">Browse All Books</a>
+    </div>
+  </div>
+</section>
+
+<!-- New & Notable -->
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">New &amp; Notable</h2>
+    <a class="section-link" href="#">See all →</a>
+  </div>
+  <div class="book-grid">
+
+    <div class="book-card">
+      <div class="book-cover c1"><div class="cover-title">The Midnight Library</div><div class="cover-author">Matt Haig</div></div>
+      <div class="book-info">
+        <div class="book-title">The Midnight Library</div>
+        <div class="book-author">Matt Haig</div>
+        <div class="book-format">Hardcover</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(12,840)</span></div>
+        <div class="book-price"><span class="price price-sale">$24.99</span><span class="price-orig">$27.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c2"><div class="cover-title">Fourth Wing</div><div class="cover-author">Rebecca Yarros</div></div>
+      <div class="book-info">
+        <div class="book-title">Fourth Wing</div>
+        <div class="book-author">Rebecca Yarros</div>
+        <div class="book-format">Hardcover</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(34,210)</span></div>
+        <div class="book-price"><span class="price">$28.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c3"><div class="cover-title">Atomic Habits</div><div class="cover-author">James Clear</div></div>
+      <div class="book-info">
+        <div class="book-title">Atomic Habits</div>
+        <div class="book-author">James Clear</div>
+        <div class="book-format">Paperback</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(89,540)</span></div>
+        <div class="book-price"><span class="price price-sale">$16.99</span><span class="price-orig">$19.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c4"><div class="cover-title">The Women</div><div class="cover-author">Kristin Hannah</div></div>
+      <div class="book-info">
+        <div class="book-title">The Women</div>
+        <div class="book-author">Kristin Hannah</div>
+        <div class="book-format">Paperback</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(21,330)</span></div>
+        <div class="book-price"><span class="price">$18.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c5"><div class="cover-title">Intermezzo</div><div class="cover-author">Sally Rooney</div></div>
+      <div class="book-info">
+        <div class="book-title">Intermezzo</div>
+        <div class="book-author">Sally Rooney</div>
+        <div class="book-format">Hardcover</div>
+        <div class="book-rating"><span class="stars">★★★★☆</span><span class="rating-count">(6,180)</span></div>
+        <div class="book-price"><span class="price">$29.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c6"><div class="cover-title">A Court of Thorns and Roses</div><div class="cover-author">Sarah J. Maas</div></div>
+      <div class="book-info">
+        <div class="book-title">A Court of Thorns and Roses</div>
+        <div class="book-author">Sarah J. Maas</div>
+        <div class="book-format">Paperback</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(54,920)</span></div>
+        <div class="book-price"><span class="price price-sale">$14.99</span><span class="price-orig">$18.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c7"><div class="cover-title">James</div><div class="cover-author">Percival Everett</div></div>
+      <div class="book-info">
+        <div class="book-title">James</div>
+        <div class="book-author">Percival Everett</div>
+        <div class="book-format">Hardcover</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(8,740)</span></div>
+        <div class="book-price"><span class="price">$26.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c8"><div class="cover-title">A Little Life</div><div class="cover-author">Hanya Yanagihara</div></div>
+      <div class="book-info">
+        <div class="book-title">A Little Life</div>
+        <div class="book-author">Hanya Yanagihara</div>
+        <div class="book-format">Paperback</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(18,260)</span></div>
+        <div class="book-price"><span class="price">$17.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Membership promo -->
+<div class="promo-wrap">
+  <div class="promo">
+    <div class="promo-badge">bookly+</div>
+    <div class="promo-text">
+      <h3>Save 10% on every order with Bookly+ membership</h3>
+      <p>Free standard shipping, early access to new releases, and a $5 monthly reading credit. Just $9.99/month or $89.99/year.</p>
+    </div>
+    <a class="btn-primary" href="#">Start Free Trial</a>
+  </div>
+</div>
+
+<!-- Best Sellers -->
+<section class="section alt">
+  <div class="section-header">
+    <h2 class="section-title">Best Sellers</h2>
+    <a class="section-link" href="#">See all →</a>
+  </div>
+  <div class="book-grid">
+
+    <div class="book-card">
+      <div class="book-cover c9"><div class="cover-title">Lessons in Chemistry</div><div class="cover-author">Bonnie Garmus</div></div>
+      <div class="book-info">
+        <div class="book-title">Lessons in Chemistry</div>
+        <div class="book-author">Bonnie Garmus</div>
+        <div class="book-format">Paperback</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(41,680)</span></div>
+        <div class="book-price"><span class="price price-sale">$17.99</span><span class="price-orig">$20.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c10"><div class="cover-title">Tomorrow, and Tomorrow, and Tomorrow</div><div class="cover-author">Gabrielle Zevin</div></div>
+      <div class="book-info">
+        <div class="book-title">Tomorrow, and Tomorrow, and Tomorrow</div>
+        <div class="book-author">Gabrielle Zevin</div>
+        <div class="book-format">Paperback</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(28,430)</span></div>
+        <div class="book-price"><span class="price">$18.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c11"><div class="cover-title">The House in the Pines</div><div class="cover-author">Ana Reyes</div></div>
+      <div class="book-info">
+        <div class="book-title">The House in the Pines</div>
+        <div class="book-author">Ana Reyes</div>
+        <div class="book-format">Hardcover</div>
+        <div class="book-rating"><span class="stars">★★★★☆</span><span class="rating-count">(5,920)</span></div>
+        <div class="book-price"><span class="price price-sale">$26.99</span><span class="price-orig">$28.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div class="book-card">
+      <div class="book-cover c12"><div class="cover-title">Happy Place</div><div class="cover-author">Emily Henry</div></div>
+      <div class="book-info">
+        <div class="book-title">Happy Place</div>
+        <div class="book-author">Emily Henry</div>
+        <div class="book-format">Paperback</div>
+        <div class="book-rating"><span class="stars">★★★★★</span><span class="rating-count">(22,150)</span></div>
+        <div class="book-price"><span class="price">$17.99</span></div>
+        <button class="add-btn">Add to Cart</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="#">bookly</a>
+      <p>Independent, book-loving, and here to help readers find their next great read since 2019.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">New Releases</a></li>
+        <li><a href="#">Best Sellers</a></li>
+        <li><a href="#">Award Winners</a></li>
+        <li><a href="#">eBooks</a></li>
+        <li><a href="#">Audiobooks</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="#">Track Your Order</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Shipping Info</a></li>
+        <li><a href="#">Gift Cards</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Bookly+</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Bookly, Inc. All rights reserved.</span>
+    <span>Made with ♥ for readers everywhere</span>
+  </div>
+</footer>
+
+<!-- Floating chat button -->
+<button class="chat-fab" id="chat-fab" aria-label="Open support chat">
+  <svg id="fab-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+  </svg>
+</button>
+
+<!-- Chat panel -->
+<div class="chat-panel" id="chat-panel">
+  <div class="spine"></div>
+  <div class="chat-inner">
+    <div class="chat-header">
+      <div class="avatar">📖</div>
+      <div>
+        <div class="agent-name">Bookly Assistant</div>
+        <div class="agent-status"><span class="status-dot"></span>Online</div>
+      </div>
+      <button class="chat-close" id="chat-close" aria-label="Close chat">✕</button>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-bar">
+      <textarea id="input" placeholder="Ask about orders, returns, shipping…" rows="1" aria-label="Message"></textarea>
+      <button class="send-btn" id="send" disabled aria-label="Send">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fab        = document.getElementById('chat-fab');
+  const fabIcon    = document.getElementById('fab-icon');
+  const panel      = document.getElementById('chat-panel');
+  const closeBtn   = document.getElementById('chat-close');
+  const messagesEl = document.getElementById('messages');
+  const inputEl    = document.getElementById('input');
+  const sendBtn    = document.getElementById('send');
+
+  const CHAT_ICON  = '<path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>';
+  const CLOSE_ICON = '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>';
+
+  let sessionId = null;
+  let typingEl  = null;
+  let busy      = false;
+  let open      = false;
+
+  function setFabIcon(isOpen) {
+    fabIcon.innerHTML = isOpen ? CLOSE_ICON : CHAT_ICON;
+  }
+
+  async function openPanel() {
+    panel.classList.add('open');
+    setFabIcon(true);
+    open = true;
+    if (!sessionId) await initSession();
+    else inputEl.focus();
+  }
+
+  function closePanel() {
+    panel.classList.remove('open');
+    setFabIcon(false);
+    open = false;
+  }
+
+  fab.addEventListener('click', () => open ? closePanel() : openPanel());
+  closeBtn.addEventListener('click', closePanel);
+
+  async function initSession() {
+    try {
+      const res = await fetch('/sessions', { method: 'POST' });
+      sessionId = (await res.json()).session_id;
+      addMessage('agent', "Hi there! 👋 I'm Bookly's support assistant.\n\nI can help you track orders, start a return, or answer questions about shipping and policies. What can I do for you today?");
+      inputEl.focus();
+    } catch {
+      addMessage('agent', "⚠️ Couldn't connect. Make sure the server is running, then refresh the page.");
+    }
+  }
+
+  function addMessage(role, text) {
+    const el = document.createElement('div');
+    el.className = `msg ${role}`;
+    el.textContent = text;
+    messagesEl.appendChild(el);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping() {
+    typingEl = document.createElement('div');
+    typingEl.className = 'msg agent typing';
+    typingEl.innerHTML = '<span></span><span></span><span></span>';
+    messagesEl.appendChild(typingEl);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function hideTyping() { typingEl?.remove(); typingEl = null; }
+
+  async function send() {
+    const text = inputEl.value.trim();
+    if (!text || busy || !sessionId) return;
+    inputEl.value = '';
+    resizeInput();
+    sendBtn.disabled = true;
+    busy = true;
+    addMessage('user', text);
+    showTyping();
+    try {
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, message: text }),
+      });
+      const data = await res.json();
+      hideTyping();
+      addMessage('agent', data.response);
+    } catch {
+      hideTyping();
+      addMessage('agent', "Sorry, I'm having trouble connecting. Please try again.");
+    } finally {
+      busy = false;
+      sendBtn.disabled = inputEl.value.trim() === '';
+      inputEl.focus();
+    }
+  }
+
+  function resizeInput() {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = inputEl.scrollHeight + 'px';
+  }
+
+  inputEl.addEventListener('input', () => {
+    resizeInput();
+    sendBtn.disabled = inputEl.value.trim() === '' || busy;
+  });
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  sendBtn.addEventListener('click', send);
+</script>
+
+</body>
+</html>
