@@ -1,9 +1,12 @@
 import os
 import uuid
+import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from agent import CustomerSupportAgent
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="Bookly Customer Support API", version="1.0.0")
 
@@ -57,7 +60,11 @@ def chat(req: ChatRequest):
             status_code=404,
             detail="Session not found. Create one first with POST /sessions.",
         )
-    reply = agent.chat(req.message)
+    try:
+        reply = agent.chat(req.message)
+    except Exception as e:
+        logging.exception("Error in agent.chat")
+        raise HTTPException(status_code=500, detail=str(e))
     return {"session_id": req.session_id, "response": reply}
 
 
