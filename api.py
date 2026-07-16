@@ -4,7 +4,7 @@ import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from agent import CustomerSupportAgent
+from agent import CustomerSupportAgent, SYSTEM_PROMPT
 
 logging.basicConfig(level=logging.INFO)
 
@@ -32,6 +32,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     session_id: str
     response: str
+    tool_calls: list = []
 
 
 class SessionResponse(BaseModel):
@@ -65,7 +66,7 @@ def chat(req: ChatRequest):
     except Exception as e:
         logging.exception("Error in agent.chat")
         raise HTTPException(status_code=500, detail=str(e))
-    return {"session_id": req.session_id, "response": reply}
+    return {"session_id": req.session_id, "response": reply, "tool_calls": agent.last_tool_calls}
 
 
 @app.post("/sessions/{session_id}/reset", response_model=SessionResponse)
@@ -75,6 +76,11 @@ def reset_session(session_id: str):
         raise HTTPException(status_code=404, detail="Session not found.")
     agent.reset()
     return {"session_id": session_id}
+
+
+@app.get("/system-prompt")
+def get_system_prompt():
+    return {"system_prompt": SYSTEM_PROMPT}
 
 
 @app.delete("/sessions/{session_id}")

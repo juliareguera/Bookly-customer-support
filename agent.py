@@ -2,6 +2,16 @@ import os
 import anthropic
 from tools import TOOL_SCHEMAS, execute_tool
 
+
+def _load_api_key() -> str:
+    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if os.path.exists(env_file):
+        with open(env_file) as f:
+            for line in f:
+                if line.startswith("ANTHROPIC_API_KEY="):
+                    return line.split("=", 1)[1].strip()
+    return os.environ.get("ANTHROPIC_API_KEY", "")
+
 SYSTEM_PROMPT = """You are a friendly and knowledgeable customer support agent for Bookly, a cozy online bookstore.
 
 You help customers with:
@@ -25,12 +35,14 @@ Guidelines:
 class CustomerSupportAgent:
     def __init__(self) -> None:
         self.client = anthropic.Anthropic(
-            api_key=os.environ.get("ANTHROPIC_API_KEY"),
+            api_key=_load_api_key(),
             base_url="https://api.anthropic.com",
         )
         self.messages: list[dict] = []
+        self.last_tool_calls: list[dict] = []
 
     def chat(self, user_message: str) -> str:
+        self.last_tool_calls = []
         self.messages.append({"role": "user", "content": user_message})
 
         while True:
@@ -53,6 +65,11 @@ class CustomerSupportAgent:
             for block in response.content:
                 if block.type == "tool_use":
                     result = execute_tool(block.name, block.input)
+                    self.last_tool_calls.append({
+                        "tool": block.name,
+                        "input": block.input,
+                        "result": result,
+                    })
                     tool_results.append(
                         {"type": "tool_result", "tool_use_id": block.id, "content": result}
                     )
@@ -66,3 +83,4 @@ class CustomerSupportAgent:
 
     def reset(self) -> None:
         self.messages = []
+        self.last_tool_calls = []
