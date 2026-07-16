@@ -2,16 +2,6 @@ import os
 import anthropic
 from tools import TOOL_SCHEMAS, execute_tool
 
-
-def _load_api_key() -> str:
-    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-    if os.path.exists(env_file):
-        with open(env_file) as f:
-            for line in f:
-                if line.startswith("ANTHROPIC_API_KEY="):
-                    return line.split("=", 1)[1].strip()
-    return os.environ.get("ANTHROPIC_API_KEY", "")
-
 SYSTEM_PROMPT = """You are a friendly and knowledgeable customer support agent for Bookly, a cozy online bookstore.
 
 You help customers with:
@@ -35,7 +25,7 @@ Guidelines:
 class CustomerSupportAgent:
     def __init__(self) -> None:
         self.client = anthropic.Anthropic(
-            api_key=_load_api_key(),
+            api_key=os.environ.get("ANTHROPIC_API_KEY"),
             base_url="https://api.anthropic.com",
         )
         self.messages: list[dict] = []
