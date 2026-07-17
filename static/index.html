@@ -442,8 +442,17 @@ footer {
 .agent-name   { color: white; font-size: 0.85rem; font-weight: 600; line-height: 1.25; }
 .agent-status { color: var(--gilt); font-size: 0.7rem; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
 .status-dot   { width: 5px; height: 5px; background: #5DBD82; border-radius: 50%; }
-.chat-close   { background: none; border: none; color: rgba(255,255,255,0.55); cursor: pointer; margin-left: auto; font-size: 1.1rem; padding: 4px; transition: color 0.15s; }
+.chat-expand {
+  background: none; border: none;
+  color: rgba(255,255,255,0.45); cursor: pointer;
+  padding: 4px; display: flex; align-items: center;
+  transition: color 0.15s; margin-left: auto;
+}
+.chat-expand:hover { color: white; }
+.chat-close   { background: none; border: none; color: rgba(255,255,255,0.55); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: color 0.15s; }
 .chat-close:hover { color: white; }
+.chat-panel.expanded      { width: 520px; height: 680px; }
+.inspector-panel.expanded { width: 440px; height: 680px; right: 564px; }
 
 .messages {
   flex: 1; overflow-y: auto;
@@ -1062,6 +1071,11 @@ footer {
         <div class="agent-name">Bookly Assistant</div>
         <div class="agent-status"><span class="status-dot"></span>Online</div>
       </div>
+      <button class="chat-expand" id="chat-expand" aria-label="Expand">
+        <svg id="expand-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+        </svg>
+      </button>
       <button class="chat-close" id="chat-close" aria-label="Close chat">✕</button>
     </div>
     <div class="messages" id="messages"></div>
@@ -1079,6 +1093,8 @@ footer {
   const fabIcon      = document.getElementById('fab-icon');
   const panel        = document.getElementById('chat-panel');
   const closeBtn     = document.getElementById('chat-close');
+  const expandBtn    = document.getElementById('chat-expand');
+  const expandIcon   = document.getElementById('expand-icon').querySelector('path');
   const messagesEl   = document.getElementById('messages');
   const inputEl      = document.getElementById('input');
   const sendBtn      = document.getElementById('send');
@@ -1088,11 +1104,23 @@ footer {
 
   const CHAT_ICON  = '<path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>';
   const CLOSE_ICON = '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>';
+  const EXPAND_D   = 'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7';
+  const COLLAPSE_D = 'M20 14h-6v6M4 10h6V4M14 20l-7-7M10 4l7 7';
 
   let sessionId = null;
   let typingEl  = null;
   let busy      = false;
   let open      = false;
+  let expanded  = false;
+
+  function toggleExpand() {
+    expanded = !expanded;
+    panel.classList.toggle('expanded', expanded);
+    inspectorEl.classList.toggle('expanded', expanded);
+    expandIcon.setAttribute('d', expanded ? COLLAPSE_D : EXPAND_D);
+    expandBtn.setAttribute('aria-label', expanded ? 'Collapse' : 'Expand');
+  }
+  expandBtn.addEventListener('click', toggleExpand);
 
   function setFabIcon(isOpen) {
     fabIcon.innerHTML = isOpen ? CLOSE_ICON : CHAT_ICON;
