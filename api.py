@@ -33,6 +33,9 @@ class ChatResponse(BaseModel):
     session_id: str
     response: str
     tool_calls: list = []
+    topic: str = "General Inquiry"
+    instructions: str = ""
+    usage: dict = {}
 
 
 class SessionResponse(BaseModel):
@@ -66,7 +69,14 @@ def chat(req: ChatRequest):
     except Exception as e:
         logging.exception("Error in agent.chat")
         raise HTTPException(status_code=500, detail=str(e))
-    return {"session_id": req.session_id, "response": reply, "tool_calls": agent.last_tool_calls}
+    return {
+        "session_id": req.session_id,
+        "response": reply,
+        "tool_calls": agent.last_tool_calls,
+        "topic": agent.last_topic,
+        "instructions": agent.last_instructions,
+        "usage": agent.last_usage,
+    }
 
 
 @app.post("/sessions/{session_id}/reset", response_model=SessionResponse)

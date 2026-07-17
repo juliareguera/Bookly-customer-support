@@ -517,7 +517,7 @@ footer {
   position: fixed;
   bottom: 98px;
   right: 424px; /* 28 FAB + 380 chat + 16 gap */
-  width: 310px;
+  width: 340px;
   height: 520px;
   border-radius: 12px;
   background: #0A1520;
@@ -671,6 +671,78 @@ footer {
   word-break: break-all;
   max-height: 70px;
   overflow: hidden;
+}
+
+/* Inspector detail — topic / scoping / actions */
+.insp-sublabel {
+  font-size: 0.57rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  padding: 6px 0 3px;
+}
+.insp-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 0 2px;
+  flex-wrap: wrap;
+}
+.insp-row-lbl {
+  font-size: 0.57rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  flex-shrink: 0;
+}
+.topic-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.token-count {
+  margin-left: auto;
+  font-size: 0.61rem;
+  color: rgba(255,255,255,0.2);
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+.scope-text {
+  font-size: 0.67rem;
+  color: rgba(176,200,216,0.5);
+  line-height: 1.55;
+  padding: 2px 0 6px;
+}
+.tool-card-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+}
+.action-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(122,66,168,0.3);
+  border: 1px solid rgba(122,66,168,0.4);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #B899E0;
+  flex-shrink: 0;
+}
+.tool-desc {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 5px;
+  font-style: italic;
 }
 
 @media (max-width: 1080px) { .inspector-panel { display: none; } }
@@ -1085,35 +1157,110 @@ footer {
 
   function hideTyping() { typingEl?.remove(); typingEl = null; }
 
-  function displayToolCalls(toolCalls, userMessage) {
-    // Remove initial empty state
+  const TOPIC_COLORS = {
+    "Order Management":  { bg: "rgba(42,122,228,0.14)",  border: "rgba(42,122,228,0.35)",  text: "#6AABFF" },
+    "Returns & Refunds": { bg: "rgba(224,122,95,0.14)",  border: "rgba(224,122,95,0.35)",  text: "#F0A090" },
+    "Shipping":          { bg: "rgba(61,139,55,0.14)",   border: "rgba(61,139,55,0.35)",   text: "#80C880" },
+    "Policy":            { bg: "rgba(122,66,168,0.14)",  border: "rgba(122,66,168,0.35)",  text: "#B899E0" },
+    "Account":           { bg: "rgba(43,188,206,0.14)",  border: "rgba(43,188,206,0.35)",  text: "#7ADDE8" },
+    "General Inquiry":   { bg: "rgba(90,105,120,0.14)",  border: "rgba(90,105,120,0.35)",  text: "#99AABB" },
+  };
+
+  function displayToolCalls(data, userMessage) {
+    const toolCalls   = data.tool_calls   || [];
+    const topic       = data.topic        || "General Inquiry";
+    const instructions = data.instructions || "";
+    const usage       = data.usage        || {};
+
     const empty = activityEl.querySelector('.activity-empty');
     if (empty) empty.remove();
 
     const block = document.createElement('div');
     block.className = 'turn-block';
 
-    // Turn label showing the user message
+    // Turn label
     const msgLabel = document.createElement('div');
     msgLabel.className = 'turn-msg';
-    msgLabel.textContent = '▸ ' + (userMessage.length > 48 ? userMessage.slice(0, 48) + '…' : userMessage);
+    msgLabel.textContent = '▸ ' + (userMessage.length > 52 ? userMessage.slice(0, 52) + '…' : userMessage);
     block.appendChild(msgLabel);
 
-    if (!toolCalls || toolCalls.length === 0) {
+    // TOPIC row
+    const topicRow = document.createElement('div');
+    topicRow.className = 'insp-row';
+
+    const topicLbl = document.createElement('span');
+    topicLbl.className = 'insp-row-lbl';
+    topicLbl.textContent = 'TOPIC';
+    topicRow.appendChild(topicLbl);
+
+    const colors = TOPIC_COLORS[topic] || TOPIC_COLORS["General Inquiry"];
+    const badge = document.createElement('span');
+    badge.className = 'topic-badge';
+    badge.textContent = topic;
+    badge.style.background   = colors.bg;
+    badge.style.borderColor  = colors.border;
+    badge.style.color        = colors.text;
+    topicRow.appendChild(badge);
+
+    if (usage.input_tokens || usage.output_tokens) {
+      const tok = document.createElement('span');
+      tok.className = 'token-count';
+      tok.textContent = `${(usage.input_tokens||0).toLocaleString()} in / ${(usage.output_tokens||0).toLocaleString()} out`;
+      topicRow.appendChild(tok);
+    }
+    block.appendChild(topicRow);
+
+    // SCOPING INSTRUCTIONS
+    if (instructions) {
+      const scopeLbl = document.createElement('div');
+      scopeLbl.className = 'insp-sublabel';
+      scopeLbl.textContent = 'Scoping Instructions';
+      block.appendChild(scopeLbl);
+
+      const scopeText = document.createElement('div');
+      scopeText.className = 'scope-text';
+      scopeText.textContent = instructions;
+      block.appendChild(scopeText);
+    }
+
+    // ACTIONS
+    const actionsLbl = document.createElement('div');
+    actionsLbl.className = 'insp-sublabel';
+    actionsLbl.textContent = toolCalls.length > 0 ? `Actions (${toolCalls.length})` : 'Actions';
+    block.appendChild(actionsLbl);
+
+    if (toolCalls.length === 0) {
       const note = document.createElement('div');
       note.className = 'no-tools-note';
       note.textContent = 'Direct response — no tools called';
       block.appendChild(note);
     } else {
-      toolCalls.forEach(tc => {
+      toolCalls.forEach((tc, i) => {
         const card = document.createElement('div');
         card.className = 'tool-card';
 
-        // Tool name
-        const nameEl = document.createElement('div');
+        // Action header: number badge + tool name
+        const head = document.createElement('div');
+        head.className = 'tool-card-head';
+
+        const num = document.createElement('span');
+        num.className = 'action-num';
+        num.textContent = String(i + 1);
+        head.appendChild(num);
+
+        const nameEl = document.createElement('span');
         nameEl.className = 'tool-card-name';
         nameEl.textContent = tc.tool + '()';
-        card.appendChild(nameEl);
+        head.appendChild(nameEl);
+        card.appendChild(head);
+
+        // Description
+        if (tc.description) {
+          const desc = document.createElement('div');
+          desc.className = 'tool-desc';
+          desc.textContent = tc.description;
+          card.appendChild(desc);
+        }
 
         // Inputs
         if (tc.input && Object.keys(tc.input).length > 0) {
@@ -1172,7 +1319,7 @@ footer {
         addMessage('agent', `Error: ${data.detail || 'Something went wrong.'}`);
       } else {
         addMessage('agent', data.response);
-        displayToolCalls(data.tool_calls, text);
+        displayToolCalls(data, text);
       }
     } catch (err) {
       hideTyping();
