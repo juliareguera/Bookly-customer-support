@@ -25,6 +25,11 @@ Things to ask:
 - *"I'd like to return ORD-1001 — wrong item."*
 - *"What are your shipping rates to Canada?"*
 - *"Can you reset the password for alice@example.com?"*
+  
+
+ Agent Inspector: A real-time debug panel (visible on desktop) that shows exactly what the agent is doing on every turn. For each message, it displays the classified topic (Order Management, Returns & Refunds, Shipping, Policy, or Account), the scoping instruction from the system prompt that governed the response, and each tool call made — numbered, with its description, inputs, and raw result. Token usage (input / output) is shown per turn. The system prompt is always visible at the top for full transparency into the agent's configuration.
+
+
 
 The mock database includes two customers and three orders:
 
