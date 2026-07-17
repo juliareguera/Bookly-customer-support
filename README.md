@@ -27,9 +27,43 @@ Things to ask:
 - *"Can you reset the password for alice@example.com?"*
   
 
- Agent Inspector: A real-time debug panel (visible on desktop) that shows exactly what the agent is doing on every turn. For each message, it displays the classified topic (Order Management, Returns & Refunds, Shipping, Policy, or Account), the scoping instruction from the system prompt that governed the response, and each tool call made — numbered, with its description, inputs, and raw result. Token usage (input / output) is shown per turn. The system prompt is always visible at the top for full transparency into the agent's configuration.
+### Agent Inspector
 
+A real-time debug panel (visible on desktop, ≥1080px) that shows exactly what the agent is doing on every turn — similar to Salesforce Agentforce's debug view. For each message it displays the classified **topic**, the **scoping instruction** from the system prompt that governed the response, and each **tool call** made — numbered, with its description, inputs, and raw result. Token usage (input / output) is shown per turn. The full system prompt is always visible at the top. Click ⤢ in the chat header to expand both panels.
 
+## Demo script
+
+### 1. Order lookup
+```
+You: what's the status of order ORD-1001?
+```
+Inspector: **Topic → Order Management** · `get_order_status()` fires with `order_id: "ORD-1001"` · result shows two books, status, tracking number, and delivery date.
+
+### 2. Return request
+```
+You: I want to return it
+```
+The agent confirms before acting (the scoping instruction says so). Reply `yes` and `request_return()` fires — a return ID is created live.
+
+### 3. Vague question
+```
+You: where is my order?
+```
+No order ID given — Claude asks for one, no tool runs. The inspector still shows **Order Management** (classified from message keywords, not tool calls).
+
+### 4. Policy question
+```
+You: what's your return policy?
+```
+Topic switches to **Policy** · `get_policy()` fires · the agent quotes the policy verbatim from the data store. Never guesses.
+
+### 5. Out of scope
+```
+You: can you recommend a book?
+```
+**Topic → General Inquiry** · no actions · the agent politely declines. The system prompt guardrail holds.
+
+---
 
 The mock database includes two customers and three orders:
 
