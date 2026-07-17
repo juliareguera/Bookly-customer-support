@@ -43,6 +43,14 @@ TOOL_TOPIC_MAP = {
 
 _TOPIC_PRIORITY = ["Returns & Refunds", "Order Management", "Account", "Shipping", "Policy"]
 
+_MESSAGE_TOPIC_KEYWORDS = {
+    "Order Management":  ["order", "status", "track", "where is", "package", "deliver", "shipped", "shipment"],
+    "Returns & Refunds": ["return", "refund", "exchange", "send back", "cancel"],
+    "Shipping":          ["shipping", "ship", "how long", "arrive", "estimated delivery", "overnight", "express"],
+    "Policy":            ["policy", "policies", "rules", "terms", "membership", "bookly+", "payment", "privacy"],
+    "Account":           ["password", "login", "sign in", "account", "forgot", "reset"],
+}
+
 TOPIC_SCOPING = {
     "Order Management": "Use get_order_status or list_customer_orders to look up orders. If an order can't be found, ask the customer to verify the order ID or email address.",
     "Returns & Refunds": "Before submitting a return with request_return, confirm the customer wants to proceed.",
@@ -102,6 +110,12 @@ class CustomerSupportAgent:
                     if prio in topics_seen:
                         self.last_topic = prio
                         break
+                if self.last_topic == "General Inquiry":
+                    msg_lower = user_message.lower()
+                    for topic, keywords in _MESSAGE_TOPIC_KEYWORDS.items():
+                        if any(kw in msg_lower for kw in keywords):
+                            self.last_topic = topic
+                            break
                 self.last_instructions = TOPIC_SCOPING[self.last_topic]
                 return next(
                     (block.text for block in response.content if block.type == "text"), ""
